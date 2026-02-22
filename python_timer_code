@@ -1,0 +1,52 @@
+import tkinter as tk
+from tkinter import messagebox
+import winsound  # 소리 재생을 위한 라이브러리 (Windows 전용)
+import threading # 소리 재생 시 UI가 멈추지 않게 하기 위함
+
+class TimerApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("소리 나는 타이머")
+        self.root.geometry("300x250")
+
+        self.label = tk.Label(root, text="초 단위로 시간을 입력하세요:", font=("Arial", 10))
+        self.label.pack(pady=10)
+
+        self.time_entry = tk.Entry(root, justify='center', font=("Arial", 15))
+        self.time_entry.pack(pady=5)
+
+        self.start_button = tk.Button(root, text="타이머 시작", command=self.start_timer, 
+                                     bg="#4CAF50", fg="white", width=15)
+        self.start_button.pack(pady=20)
+
+        self.remaining_label = tk.Label(root, text="00:00", font=("Arial", 25, "bold"), fg="#FF5722")
+        self.remaining_label.pack()
+
+    def play_alarm(self):
+        # 주파수 1000Hz로 2초 동안 소리 내기
+        winsound.Beep(1000, 2000)
+
+    def start_timer(self):
+        try:
+            seconds = int(self.time_entry.get())
+            self.countdown(seconds)
+        except ValueError:
+            messagebox.showerror("오류", "숫자만 입력해 주세요!")
+
+    def countdown(self, count):
+        mins, secs = divmod(count, 60)
+        time_format = f"{mins:02d}:{secs:02d}"
+        self.remaining_label.config(text=time_format)
+
+        if count > 0:
+            self.root.after(1000, self.countdown, count - 1)
+        else:
+            # 시간이 종료되면 별도의 스레드에서 소리를 재생 (UI 얼음 방지)
+            threading.Thread(target=self.play_alarm, daemon=True).start()
+            messagebox.showinfo("완료", "시간이 다 되었습니다!")
+            self.remaining_label.config(text="00:00")
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = TimerApp(root)
+    root.mainloop()

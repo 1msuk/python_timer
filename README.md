@@ -1,1 +1,1 @@
-# python_timer
+# I made a simple timer. It was made in Python.

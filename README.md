@@ -1,1 +1,1 @@
-# I made a simple timer. It was made in Python.
+# 간단히 만들어본 python 알람
